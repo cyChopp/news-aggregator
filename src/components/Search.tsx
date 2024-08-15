@@ -21,6 +21,7 @@ function Search({
         }`}
       >
         <input
+          disabled={isFetching}
           className="absolute h-full w-full left-0 pl-4 outline-none rounded-[20px]"
           value={value}
           onChange={handleSearch}
@@ -28,12 +29,6 @@ function Search({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        {/* <button
-          className="absolute h-full bg-black border-black-200 right-0 text-white rounded-[20px] px-[15px]"
-          type="submit"
-        >
-          Search
-        </button> */}
         <Button
           disabled={isFetching}
           className="absolute h-full bg-black border-black-200 right-0 text-white rounded-[20px] px-[15px]"
@@ -41,7 +36,7 @@ function Search({
           onClick={handleSubmit}
         >
           {isFetching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Search
+          {isFetching ? "Searching" : "Search"}
         </Button>
       </div>
     </div>
