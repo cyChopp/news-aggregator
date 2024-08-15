@@ -1,17 +1,38 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import { Button } from "./components/ui/button";
+import Header from "@/components/Header";
+import SubHeader from "@/containers/SubHeader";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [search, setSearch] = useState<string>("");
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    setIsFetching(true);
+
+    const timerId = setTimeout(() => {
+      setIsFetching(false);
+    }, 5000);
+
+    console.log(search, "SEARCH");
+    setSearch("");
+
+    return () => clearTimeout(timerId);
+  };
 
   return (
     <>
-      <div>
-        <Button>Click me</Button>
-      </div>
+      <Header />
+      <SubHeader
+        value={search}
+        handleSearch={handleSearch}
+        handleSubmit={handleSubmit}
+        isFetching={isFetching}
+      />
     </>
   );
 }
