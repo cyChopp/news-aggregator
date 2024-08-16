@@ -18,14 +18,14 @@ export type TSearch = {
 };
 
 export type TArticle = {
-  url: string | null;
-  imgUrl: string | null;
-  title: string | null;
-  description?: string | null;
-  category?: string | null;
-  publishedAt: string | null;
-  source?: string | null;
-  author?: string | null;
+  url: string | undefined;
+  imgUrl: string | undefined;
+  title: string | undefined;
+  description?: string | undefined;
+  category?: string | undefined;
+  publishedAt: Date | undefined;
+  source?: string | undefined;
+  author?: string | undefined;
 };
 
 export type TSource = {

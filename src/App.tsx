@@ -13,6 +13,8 @@ import { loadKey } from "@/utils/loadKey";
 import { FilterForm } from "@/components/FilterForm";
 import { z } from "zod";
 import { formSchema } from "@/utils/schemas";
+import Article from "./components/Article";
+import Seperator from "./components/Seperator";
 
 const dateParser = (date: Date) => {
   return format(date, "yyyy-MM-dd");
@@ -92,7 +94,6 @@ function App() {
 */
 
   const personalizeData = (filterData: any) => {
-    console.log(filterData, "!!!! 1");
     if (filterData) {
       let personalizedData = [...filterData];
 
@@ -111,7 +112,7 @@ function App() {
           personalize.sources.includes(item.origin)
         );
       }
-      console.log(filterData, "!!!! 2");
+      console.log(personalizedData, "PERSONALIZED DATA");
 
       setData(personalizedData);
     }
@@ -120,10 +121,6 @@ function App() {
   useEffect(() => {
     personalizeData(data);
   }, [personalize]);
-
-  useEffect(() => {
-    console.log(data, "!!!! 3");
-  }, [data]);
 
   useEffect(() => {
     let sources = [];
@@ -150,7 +147,6 @@ function App() {
     }
     if (isFetching === true) {
       (async () => {
-        // await Promise.all([])
         await Promise.all([...sources])
           .then((values) => {
             console.log(values, "VALUES");
@@ -186,6 +182,14 @@ function App() {
           onFilterSubmit={setPersonalize}
           formInfo={personalize}
         />
+      </div>
+
+      <Seperator />
+
+      <div className="mt-[40px] grid grid-cols-1 md:grid-cols-2 gap-8">
+        {data.map((article: any, idx: number) => {
+          return <Article key={idx} article={article} />;
+        })}
       </div>
     </>
   );
