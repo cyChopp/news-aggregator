@@ -1,5 +1,4 @@
 import axios from "axios";
-import { TParams } from "./TShared";
 
 const NYTIMES_BASE_URL = "https://api.nytimes.com/svc/search/v2/";
 const THENEWSAPI_BASE_URL = "https://api.thenewsapi.com/v1/news/";

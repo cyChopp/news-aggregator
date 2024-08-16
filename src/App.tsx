@@ -1,21 +1,44 @@
 import { useEffect, useState } from "react";
-import "./App.css";
+import "@/App.css";
 import Header from "@/components/Header";
 import SubHeader from "@/containers/SubHeader";
-import { TArticle, TParams } from "./utils/TShared";
+import { TParams } from "@/utils/TShared";
 import {
   fetchGuardianArticles,
   fetchNyTimesArticles,
   fetchTheNewsApiArticles,
-} from "./utils/api";
-import Personalize from "./containers/Personalize";
-import Filter from "./containers/Filter";
+} from "@/utils/api";
 import { format } from "date-fns";
+import { loadKey } from "@/utils/loadKey";
+import { FilterForm } from "@/components/FilterForm";
+import { z } from "zod";
+import { formSchema } from "@/utils/schemas";
+
+const dateParser = (date: Date) => {
+  return format(date, "yyyy-MM-dd");
+};
+
+let filterDefaultValues = {
+  category: "",
+  date: new Date(),
+  sources: ["nyTimes", "theGuardian", "theNewsApi"],
+};
+let personalizeDefaultValues = {
+  author: "",
+  category: "",
+  sources: ["nyTimes", "theGuardian", "theNewsApi"],
+};
 
 function App() {
-  const [date, setDate] = useState(Date.now());
+  const [filter, setFilter] = useState<z.infer<typeof formSchema>>(() =>
+    loadKey("filter", filterDefaultValues)
+  );
+  const [personalize, setPersonalize] = useState(() =>
+    loadKey("personalize", personalizeDefaultValues)
+  );
+
+  const [data, setData] = useState<any>([]);
   const [search, setSearch] = useState<string>("");
-  const [data, setData] = useState<TArticle[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,59 +49,113 @@ function App() {
     setIsFetching(true);
   };
 
-  useEffect(() => {
-    console.log(format(date, "yyyy-MM-dd"), "date!!!");
-  }, [date]);
-  // if (sessionStorage.getItem("filterBy")) {
-  //   console.log(
-  //     JSON.parse(sessionStorage.getItem("filterBy") as any),
-  //     "!!!!!!±!!"
-  //   );
-  // }
   const apiParams: TParams = {
     nyTimes: {
       q: search,
-      begin_date: format(date as any, "yyyy-MM-dd"),
-      end_date: format(date as any, "yyyy-MM-dd"),
-      fq: 'document_type:("multimedia")',
-      section_name: "sport", //category
+      // fq: 'document_type:("multimedia")',
+      fq: `section_name: ${filter.category}`,
+      ...(filter.date && { begin_date: dateParser(filter.date) }),
+      ...(filter.date && { end_date: dateParser(filter.date) }),
+      ...(filter.category !== "" && {}),
       "api-key": import.meta.env.VITE_NYTIMES_API_KEY,
     },
     guardian: {
       q: search,
-      "from-date": format(date as any, "yyyy-MM-dd"),
-      "to-date": format(date as any, "yyyy-MM-dd"),
       "show-elements": "image",
       "show-tags": "contributor",
-      // section: "sport",//category
+      ...(filter.date && { "from-date": dateParser(filter.date) }),
+      ...(filter.date && { "to-date": dateParser(filter.date) }),
+      ...(filter.category !== "" && {
+        section: filter.category,
+      }),
       "api-key": import.meta.env.VITE_GUARDIAN_API_KEY,
     },
     theNews: {
       search: search,
-      published_on: format(date as any, "yyyy-MM-dd"),
       language: "en",
-      // categories: "sport",//category
+      ...(filter.date && { published_on: dateParser(filter.date) }),
+      ...(filter.category !== "" && {
+        categories: filter.category,
+      }),
       api_token: import.meta.env.VITE_THENEWSAPI_API_KEY,
     },
   };
 
+  // Probably can do something like this instread of the if statements, but the api structure should be modified
+  /* for(const source in sources){
+    if(source){
+    api.['nyTimes']({
+        params:apiParams['nyTiems']
+      })
+    }
+  }
+*/
+
+  const personalizeData = (filterData: any) => {
+    console.log(filterData, "!!!! 1");
+    if (filterData) {
+      let personalizedData = [...filterData];
+
+      if (personalize.category !== "") {
+        personalizedData = personalizedData.filter(
+          (item: any) => item.category === personalize.category
+        );
+      }
+      if (personalize.author !== "") {
+        personalizedData = personalizedData.filter(
+          (item) => item.author === personalize.author
+        );
+      }
+      if (personalize.sources.legnth !== 2) {
+        personalizedData = personalizedData.filter((item) =>
+          personalize.sources.includes(item.origin)
+        );
+      }
+      console.log(filterData, "!!!! 2");
+
+      setData(personalizedData);
+    }
+  };
+
   useEffect(() => {
-    if (isFetching) {
+    personalizeData(data);
+  }, [personalize]);
+
+  useEffect(() => {
+    console.log(data, "!!!! 3");
+  }, [data]);
+
+  useEffect(() => {
+    let sources = [];
+    if (filter.sources.includes("nyTimes")) {
+      sources.push(
+        fetchNyTimesArticles({
+          params: apiParams.nyTimes,
+        })
+      );
+    }
+    if (filter.sources.includes("theGuardian")) {
+      sources.push(
+        fetchGuardianArticles({
+          params: apiParams.guardian,
+        })
+      );
+    }
+    if (filter.sources.includes("theNewsApi")) {
+      sources.push(
+        fetchTheNewsApiArticles({
+          params: apiParams.theNews,
+        })
+      );
+    }
+    if (isFetching === true) {
       (async () => {
-        await Promise.all([
-          fetchTheNewsApiArticles({
-            params: apiParams.theNews,
-          }),
-          fetchNyTimesArticles({
-            params: apiParams.nyTimes,
-          }),
-          fetchGuardianArticles({
-            params: apiParams.guardian,
-          }),
-        ])
+        // await Promise.all([])
+        await Promise.all([...sources])
           .then((values) => {
             console.log(values, "VALUES");
-            setData([...data, ...values.flat()]);
+            // setData([...data, ...values.flat()]);
+            personalizeData([...values.flat()]);
           })
           .finally(() => {
             setIsFetching(false);
@@ -98,8 +175,17 @@ function App() {
         isFetching={isFetching}
       />
       <div className="flex flex-row gap-4 mt-[40px]">
-        <Filter date={date} setDate={setDate} />
-        <Personalize />
+        <FilterForm
+          isFilterBy={true}
+          onFilterSubmit={setFilter}
+          formInfo={filter}
+        />
+
+        <FilterForm
+          isFilterBy={false}
+          onFilterSubmit={setPersonalize}
+          formInfo={personalize}
+        />
       </div>
     </>
   );

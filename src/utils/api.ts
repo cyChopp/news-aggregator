@@ -1,4 +1,4 @@
-import { TArticle, TParams } from "./TShared";
+import { TArticle } from "./TShared";
 import { guardianApi, theNewsApi, nytimesApi } from "./baseApi";
 
 // Fetch articles from the API
@@ -21,6 +21,7 @@ export const fetchNyTimesArticles = async (
         category: item.section_name,
         publishedAt: item.pub_date,
         author: item.byline.original,
+        origin: "nyTimes",
       };
     });
   } catch (error) {
@@ -44,6 +45,7 @@ export const fetchTheNewsApiArticles = async (
         category: item.categories[0],
         publishedAt: item.published_at,
         author: "unknown",
+        origin: "theNewsApi",
       };
     });
   } catch (error) {
@@ -66,6 +68,7 @@ export const fetchGuardianArticles = async (
         category: item.sectionName,
         publishedAt: item.webPublicationDate,
         author: item.tags[0]?.webTitle ?? "unknown",
+        origin: "theGuardian",
       };
     });
   } catch (error) {

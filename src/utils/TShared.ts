@@ -1,3 +1,15 @@
+export type TFilter = {
+  author?: string;
+  category: string;
+  date?: Date | undefined;
+  sources: string[];
+};
+export type TPersonalize = {
+  author: string;
+  category: string;
+  sources: string[];
+};
+
 export type TSearch = {
   value: string;
   isFetching: boolean;
@@ -16,14 +28,20 @@ export type TArticle = {
   author?: string | null;
 };
 
+export type TSource = {
+  nyTime: boolean;
+  theGuardian: boolean;
+  theNewsApi: boolean;
+};
+
 // API params
 export type TParams = {
   nyTimes: {
     q: string | null;
     begin_date?: string | null;
     end_date?: string | null;
-    fq: string;
-    section_name: string | null;
+    fq?: string;
+    section_name?: string | null;
     "api-key": string;
   };
   guardian: {
