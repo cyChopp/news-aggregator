@@ -22,16 +22,19 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Checkbox } from "./ui/checkbox";
 import { Calendar } from "./ui/calendar";
-import { formSchema } from "@/utils/schemas";
+import { formSchema } from "@/Schemas/schemas";
+import { toDate } from "date-fns";
 
 export function FilterForm({
   formInfo,
   isFilterBy = true,
   onFilterSubmit,
+  setShowPersonalizedData,
 }: {
   formInfo: z.infer<typeof formSchema>;
   isFilterBy: boolean;
   onFilterSubmit: (data: z.infer<typeof formSchema>) => void;
+  setShowPersonalizedData?: (e: boolean) => void;
 }) {
   const sources = [
     { id: "nyTimes", label: "New York Times" },
@@ -42,26 +45,38 @@ export function FilterForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      sources: ["nyTimes", "theGuardian", "theNewsApi"],
-      category: "",
-      ...(isFilterBy && { date: new Date() }),
-      ...(!isFilterBy && { author: "" }),
+      sources: formInfo.sources ?? ["nyTimes", "theGuardian", "theNewsApi"],
+      category: formInfo.category ?? "",
+      ...(isFilterBy && {
+        date: formInfo.date ? toDate(formInfo.date) : new Date(),
+      }),
+      ...(!isFilterBy && { author: formInfo.author ?? "" }),
     },
   });
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     console.log(data, "DATA SUBMITED");
+
     if (isFilterBy) {
       sessionStorage.setItem("filter", JSON.stringify(data));
     } else {
       sessionStorage.setItem("personalize", JSON.stringify(data));
     }
 
+    if (setShowPersonalizedData) {
+      setShowPersonalizedData(true);
+    }
+
     onFilterSubmit(data);
   }
 
+  //Clears filter | personalize session values and resets shadcn's form
   function onClear() {
     console.log(form, "DATA CLEARED");
+
+    if (setShowPersonalizedData) {
+      setShowPersonalizedData(false);
+    }
 
     let clearData = {
       sources: ["nyTimes", "theGuardian", "theNewsApi"],
@@ -70,8 +85,6 @@ export function FilterForm({
       ...(!isFilterBy && { author: "" }),
     };
 
-    form.reset(clearData);
-
     if (isFilterBy) {
       sessionStorage.setItem("filter", JSON.stringify(clearData));
       onFilterSubmit(clearData);
@@ -79,6 +92,9 @@ export function FilterForm({
       sessionStorage.setItem("personalize", JSON.stringify(clearData));
       onFilterSubmit(clearData);
     }
+
+    //Reset shadcn's form.
+    form.reset(clearData);
   }
 
   return (
@@ -90,7 +106,7 @@ export function FilterForm({
         <SheetHeader className="h-full w-full">
           <div className="h-full flex flex-col justify-between overflow-y-scroll p-2">
             <div>
-              <SheetTitle className=" font-bold text-xl flex justify-start">
+              <SheetTitle className=" font-bold text-2xl flex justify-start mb-4">
                 {isFilterBy ? "Filter by:" : "Personalize by:"}
               </SheetTitle>
 
@@ -123,7 +139,7 @@ export function FilterForm({
                       )}
                     />
                   )}
-                  {/*Sources */}
+                  {/* Sources */}
                   <FormField
                     control={form.control}
                     name="sources"
@@ -174,7 +190,7 @@ export function FilterForm({
                       </FormItem>
                     )}
                   />
-                  {/* Input Category*/}
+                  {/* Input - Category*/}
                   <FormField
                     control={form.control}
                     name="category"
@@ -189,7 +205,7 @@ export function FilterForm({
                       </FormItem>
                     )}
                   />
-                  {/*Input Author */}
+                  {/*Input - Author */}
                   {!isFilterBy && (
                     <FormField
                       control={form.control}

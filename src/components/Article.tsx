@@ -1,9 +1,10 @@
-import { TArticle } from "@/utils/TShared";
+import { TArticleResponse } from "@/Types/TShared";
 import { format } from "date-fns";
 import ReadArticle from "./ReadArticle";
+import { truncate } from "@/utils/truncate";
 
 type TProp = {
-  article: TArticle;
+  article: TArticleResponse;
 };
 
 const defaultImageLink =
@@ -34,7 +35,7 @@ function Article({ article }: TProp) {
         <div className="absolute h-[70px] w-full bottom-0 backdrop-blur-xl bg-white/10 text-white px-4 py-2 border-t border-[#d0d0d029]">
           <div className="flex justify-between">
             <div className="flex flex-col">
-              <div>{author}</div>
+              <div>{truncate(author, 30) ?? "unknown"}</div>
               <div className="text-sm text-gray-200">
                 {publishedAt && format(publishedAt, "MM-dd-yyyy")}
               </div>
@@ -43,15 +44,11 @@ function Article({ article }: TProp) {
           </div>
         </div>
       </div>
-      <div className="pt-4 h-[200px]">
+      <div className="pt-4 mb-12 h-[200px] md:h-[150px]">
         <div className="h-[200px] flex flex-col justify-between">
           <div>
-            <p className="font-bold text-2xl pb-3">{title}</p>
-            <p className="pb-4 pr-2">
-              {description && description.length > 190
-                ? description.slice(0, 190) + "..."
-                : description}
-            </p>
+            <p className="font-bold text-2xl pb-3">{truncate(title, 70)}</p>
+            <p className="pb-4 pr-2">{truncate(description, 190)}</p>
           </div>
           <ReadArticle url={url} />
         </div>
