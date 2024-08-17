@@ -24,6 +24,7 @@ import { Button } from "./components/ui/button";
 import { Loader2 } from "lucide-react";
 import { extractPagination } from "./utils/extractPagination";
 import SkeletonArticle from "./components/SkeletonArticle";
+import { v4 as uuidv4 } from "uuid";
 
 const dateParser = (date: Date) => {
   return format(date, "yyyy-MM-dd");
@@ -263,7 +264,7 @@ function App() {
         )}
         {isFetching &&
           [...Array(4)].map(() => {
-            return <SkeletonArticle />;
+            return <SkeletonArticle key={uuidv4()} />;
           })}
       </div>
 
