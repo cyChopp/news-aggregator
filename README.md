@@ -1,51 +1,76 @@
-# React + TypeScript + Vite
+# News aggregator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a News Aggregator application built with React, Vite, and Docker.
 
-Currently, two official plugins are available:
+## Technology Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React**
+- **Vite**
+- **Docker**
+- **typescript**
+- **shadcn-ui**
+- **tailwind**
+- **axios**
+- **zod**
+- **date-fns**
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+To run the application within a Docker container, follow these steps:
 
-- Configure the top-level `parserOptions` property like this:
+### 1. Build the Docker Image
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Ensure Docker is running on your machine, then open your terminal and execute the following command:
+
+```bash
+docker build -t aggregator .
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+This will create a Docker image for the application.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### 2. Run the Docker Container
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+After the image has been created, you can start a container using the image. Replace <image_id> with the actual image ID from the list of Docker images, which you can find using the command `docker images` or directly in the Docker app.
+
+```bash
+docker run -p 5173:5173 <image_id>
 ```
-# news-aggregator
+
+### 3. Access the Application
+
+Once the container is running, open your browser and go to [http://localhost:5173/](http://localhost:5173/) to access the application.
+
+&nbsp;
+&nbsp;
+&nbsp;
+
+# Challenge Description
+
+```text
+The challenge is to create the user interface for a news aggregator website that pulls articles from various sources and displays them in a clean, easy-to-read format.
+
+Requirements
+
+1. Article search and filtering: Users should be able to search for articles by keyword and filter the results by date, category, and source.
+2. Personalized news feed: Users should be able to customize their news feed by selecting their preferred sources, categories, and authors.
+3. Mobile-responsive design: The website should be optimized for viewing on mobile devices.
+
+Data Sources
+
+Choose at least 3 of the following data sources:
+
+1. NewsAPI: A comprehensive API that allows developers to access articles from more than 70,000 news sources, including major newspapers, magazines, and blogs. The API provides access to articles in various languages and categories, and it supports search and filtering.
+2. OpenNews: This API provides access to a wide range of news content from various sources, including newspapers, magazines, and blogs. It allows developers to retrieve articles based on keywords, categories, and sources.
+3. NewsCred: The NewsCred API provides access to a wide range of news content from various sources, including newspapers, magazines, and blogs. The API allows developers to retrieve articles based on keywords, categories, and sources, as well as to search for articles by author, publication, and topic.
+4. The Guardian**: This API allows developers to access articles from The Guardian newspaper, one of the most respected news sources in the world. The API provides access to articles in various categories and supports search and filtering.
+5. New York Times**: This API allows developers to access articles from The New York Times, one of the most respected news sources in the world. The API provides access to articles in various categories and supports search and filtering.
+6. BBC News: This API allows developers to access news from BBC News, one of the most trusted news sources in the world. It provides access to articles in various categories and supports search and filtering.
+7. NewsAPI.org**: This API provides access to news articles from thousands of sources, including news publications, blogs, and magazines. It allows developers to retrieve articles based on keywords, categories, and sources.
+
+Challenge Guidelines
+
+1. The output expected from this challenge is a front-end project using React.js.
+2. You are free to choose at least three data sources from the provided list to fetch articles for your news aggregator.
+3. Ensure that the Frontend application can be containerized using Docker and provide clear documentation on how to run the project within a Docker container.
+4. Incorporate best practices of software development such as DRY (Don't Repeat Yourself), KISS (Keep It Simple, Stupid), and SOLID (Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion) into your code.
+```
