@@ -14,6 +14,8 @@ This project is a News Aggregator application built with React, Vite, and Docker
 - **zod**
 - **date-fns**
 
+[Figma link](https://www.figma.com/design/9lHxMZEyAZUjvFlUuEh549/Untitled)
+
 ## Getting Started
 
 To run the application within a Docker container, follow these steps:
