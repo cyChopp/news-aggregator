@@ -27,7 +27,7 @@ function Search({
           className=" h-full w-3/5 left-0 pl-4 outline-none rounded-[20px]"
           value={value}
           onChange={handleSearch}
-          placeholder="Type your subject..."
+          placeholder="e.g news"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
