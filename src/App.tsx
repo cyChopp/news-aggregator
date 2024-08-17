@@ -175,7 +175,9 @@ function App() {
     if (isFetching && isMounted) {
       let sources: Array<() => Promise<TArticle>> = [];
 
-      // checks for !loadMore because the api's free plan doesn't provide pagination
+      // Add article sources based on the filter by:
+
+      // Checks for !loadMore because the api's free plan doesn't provide pagination (theNewsApi)
       filter.sources.includes("theNewsApi") &&
         !loadMore &&
         sources.push(() =>

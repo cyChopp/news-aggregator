@@ -13,7 +13,7 @@ export const fetchNyTimesArticles = async (params: any): Promise<TArticle> => {
         url: item.web_url,
         imgUrl: item.multimedia[0]?.url
           ? `https://www.nytimes.com/${item.multimedia[0]?.url}`
-          : null,
+          : undefined,
         title: item.headline.main,
         description: item.lead_paragraph,
         category: item.section_name.toLowerCase(),
@@ -37,6 +37,7 @@ export const fetchNyTimesArticles = async (params: any): Promise<TArticle> => {
   }
 };
 
+//This api doesn't have any pagination due to it's free plan restrictions
 export const fetchTheNewsApiArticles = async (
   params: any
 ): Promise<TArticle> => {
