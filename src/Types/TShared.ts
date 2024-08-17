@@ -68,28 +68,27 @@ export type TParams = {
   nyTimes: {
     q: string;
     sort: string;
-    page?: string;
-    begin_date?: string;
-    end_date?: string;
-    fq?: string;
-    section_name?: string;
+    page?: string | undefined;
+    fq?: string | undefined;
+    end_date?: string | undefined;
+    begin_date?: string | undefined;
     "api-key": string;
   };
   guardian: {
     q: string;
-    page?: string;
-    "order-by": string;
-    "from-date"?: string;
-    "to-date"?: string;
     "show-elements": string;
     "show-tags": string;
+    "order-by": string;
+    page?: string;
+    "from-date"?: string;
+    "to-date"?: string;
     section?: string;
     "api-key": string;
   };
   theNews: {
     search: string;
-    published_on?: string;
     language: string;
+    published_on?: string;
     categories?: string;
     api_token: string;
   };

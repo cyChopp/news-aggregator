@@ -23,6 +23,7 @@ import Seperator from "./components/Seperator";
 import { Button } from "./components/ui/button";
 import { Loader2 } from "lucide-react";
 import { extractPagination } from "./utils/extractPagination";
+import SkeletonArticle from "./components/SkeletonArticle";
 
 const dateParser = (date: Date) => {
   return format(date, "yyyy-MM-dd");
@@ -76,7 +77,7 @@ function App() {
 
       if (personalize.category !== "") {
         personalizedData = personalizedData.filter(
-          (item: any) => item.category === personalize.category
+          (item) => item.category === personalize.category
         );
       }
       if (personalize.author !== "") {
@@ -258,6 +259,10 @@ function App() {
             <Article key={idx} article={article} />
           )
         )}
+        {isFetching &&
+          [...Array(4)].map(() => {
+            return <SkeletonArticle />;
+          })}
       </div>
 
       {showLoadButton && (
