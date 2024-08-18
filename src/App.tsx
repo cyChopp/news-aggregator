@@ -13,22 +13,17 @@ import {
   fetchNyTimesArticles,
   fetchTheNewsApiArticles,
 } from "@/utils/api";
-import { format } from "date-fns";
 import { loadKey } from "@/utils/loadKey";
 import { FilterForm } from "@/components/FilterForm";
 import { z } from "zod";
 import { formSchema } from "@/Schemas/schemas";
 import Article from "./components/Article";
 import Seperator from "./components/Seperator";
-import { Button } from "./components/ui/button";
-import { Loader2 } from "lucide-react";
 import { extractPagination } from "./utils/extractPagination";
 import SkeletonArticle from "./components/SkeletonArticle";
 import { v4 as uuidv4 } from "uuid";
-
-const dateParser = (date: Date) => {
-  return format(date, "yyyy-MM-dd");
-};
+import { dateParser } from "./utils/dateParser";
+import LoadMoreButton from "./components/LoadMoreButton";
 
 let filterDefaultValues = {
   category: "",
@@ -60,6 +55,7 @@ function App() {
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [pagination, setPagination] = useState<TPagination>({});
   const [loadMore, setLoadMore] = useState<boolean>(false);
+  const [dataNotFound, setDataNotFound] = useState<boolean>(false);
 
   const showLoadButton =
     data.length > 0 && Object.keys(pagination).length > 0 && search.length > 0;
@@ -70,6 +66,7 @@ function App() {
 
   const handleSubmit = () => {
     setIsFetching(true);
+    setDataNotFound(false);
   };
 
   const personalizeData = (filterData: TArticleResponse[]) => {
@@ -217,6 +214,10 @@ function App() {
           } else {
             personalizeData([...dataResponse]);
           }
+
+          if ([...data, ...dataResponse].length === 0) {
+            setDataNotFound(true);
+          }
         } catch (error) {
           console.log(error, "ERROR");
         } finally {
@@ -256,6 +257,11 @@ function App() {
 
       <Seperator />
 
+      {dataNotFound && (
+        <div className="w-full flex justify-center mt-10 text-xl  text-gray-500">
+          No articles found. Check again your input, filter or personalization.
+        </div>
+      )}
       <div className="mt-[40px] grid grid-cols-1 md:grid-cols-2 gap-8">
         {(showPersonalizedData ? personalizedData : data).map(
           (article: TArticleResponse, idx: number) => (
@@ -270,14 +276,10 @@ function App() {
 
       {showLoadButton && (
         <div className="w-full flex justify-center my-12">
-          <Button
-            disabled={isFetching}
-            className="rounded-full"
-            onClick={loadMorePages}
-          >
-            {isFetching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isFetching ? "Loading..." : "Load more"}
-          </Button>
+          <LoadMoreButton
+            isFetching={isFetching}
+            loadMorePages={loadMorePages}
+          />
         </div>
       )}
     </>

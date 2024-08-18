@@ -8,7 +8,7 @@ function ReadArticle({ url }: { url: string | undefined }) {
       target="_blank"
     >
       Read article
-      <img className="pl-1" src={arrow} />
+      <img className="ml-1 -rotate-[135deg]" src={arrow} />
     </a>
   );
 }
