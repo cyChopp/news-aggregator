@@ -22,8 +22,8 @@ import Seperator from "./components/Seperator";
 import { extractPagination } from "./utils/extractPagination";
 import SkeletonArticle from "./components/SkeletonArticle";
 import { v4 as uuidv4 } from "uuid";
-import { dateParser } from "./utils/dateParser";
 import LoadMoreButton from "./components/LoadMoreButton";
+import { apiParams } from "./utils/apiParams";
 
 let filterDefaultValues = {
   category: "",
@@ -59,6 +59,8 @@ function App() {
 
   const showLoadButton =
     data.length > 0 && Object.keys(pagination).length > 0 && search.length > 0;
+
+  let params = apiParams({ search, filter, pagination });
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -124,45 +126,6 @@ function App() {
     setLoadMore(loadMore);
   };
 
-  // API filter parameters
-  const apiParams: TParams = {
-    nyTimes: {
-      q: search,
-      sort: "relevance",
-      ...(pagination.nyTimes && {
-        page: pagination.nyTimes.currentPage.toString(),
-      }),
-      ...(filter.category && { fq: `section_name: ${filter.category}` }),
-      ...(filter.date && { begin_date: dateParser(filter.date) }),
-      ...(filter.date && { end_date: dateParser(filter.date) }),
-      "api-key": import.meta.env.VITE_NYTIMES_API_KEY,
-    },
-    guardian: {
-      q: search,
-      "show-elements": "image",
-      "show-tags": "contributor",
-      "order-by": "relevance",
-      ...(pagination.theGuardian && {
-        page: pagination.theGuardian.currentPage.toString(),
-      }),
-      ...(filter.date && { "from-date": dateParser(filter.date) }),
-      ...(filter.date && { "to-date": dateParser(filter.date) }),
-      ...(filter.category !== "" && {
-        section: filter.category,
-      }),
-      "api-key": import.meta.env.VITE_GUARDIAN_API_KEY,
-    },
-    theNews: {
-      search: search,
-      language: "en",
-      ...(filter.date && { published_on: dateParser(filter.date) }),
-      ...(filter.category !== "" && {
-        categories: filter.category,
-      }),
-      api_token: import.meta.env.VITE_THENEWSAPI_API_KEY,
-    },
-  };
-
   useEffect(() => {
     personalizeData(data);
   }, [personalize]);
@@ -173,26 +136,26 @@ function App() {
     if (isFetching && isMounted) {
       let sources: Array<() => Promise<TArticle>> = [];
 
-      // Add article sources based on the filter by:
+      // Add article sources based on the filter by
 
       // Checks for !loadMore because the api's free plan doesn't provide pagination (theNewsApi)
       filter.sources.includes("theNewsApi") &&
         !loadMore &&
         sources.push(() =>
           fetchTheNewsApiArticles({
-            params: apiParams.theNews,
+            params: params.theNews,
           })
         );
       filter.sources.includes("nyTimes") &&
         sources.push(() =>
           fetchNyTimesArticles({
-            params: apiParams.nyTimes,
+            params: params.nyTimes,
           })
         );
       filter.sources.includes("theGuardian") &&
         sources.push(() =>
           fetchGuardianArticles({
-            params: apiParams.guardian,
+            params: params.guardian,
           })
         );
 
